@@ -35,4 +35,4 @@ npm run deploy
 
 ## Ссылка на проект
 
-[Открыть проект](https://arsen1y-dev.github.io/mesto-ad/)
+[Открыть проект]([https://arsen1y-dev.github.io/mesto-ad/](https://github.com/Arsen1y-dev/mesto-ad))
