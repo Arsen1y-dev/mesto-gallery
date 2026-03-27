@@ -28,7 +28,11 @@ export const createCardElement = (
         likeButton.classList.add("card__like-button_is-active");
     }
 
-    if (data.owner._id !== currentUserId) {
+    if (data.owner._id === currentUserId) {
+        deleteButton.addEventListener("click", () => {
+            onDeleteCard(data._id, cardElement);
+        });
+    } else {
         deleteButton.remove();
     }
 
@@ -36,12 +40,6 @@ export const createCardElement = (
         const liked = likeButton.classList.contains("card__like-button_is-active");
         onLikeCard(data._id, liked, likeButton, likeCount);
     });
-
-    if (data.owner._id === currentUserId) {
-        deleteButton.addEventListener("click", () => {
-            onDeleteCard(data._id, cardElement);
-        });
-    }
 
     if (infoButton) {
         infoButton.addEventListener("click", () => {
