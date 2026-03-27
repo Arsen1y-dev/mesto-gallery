@@ -1,42 +1,57 @@
-export const likeCard = (likeButton) => {
-  likeButton.classList.toggle("card__like-button_is-active");
-};
-
-export const deleteCard = (cardElement) => {
-  cardElement.remove();
-};
-
 const getTemplate = () => {
-  return document
-    .getElementById("card-template")
-    .content.querySelector(".card")
-    .cloneNode(true);
+    return document
+        .getElementById("card-template")
+        .content.querySelector(".card")
+        .cloneNode(true);
 };
 
 export const createCardElement = (
-  data,
-  { onPreviewPicture, onLikeIcon, onDeleteCard }
+    data,
+    currentUserId,
+    { onPreviewPicture, onLikeCard, onDeleteCard, onInfoCard }
 ) => {
-  const cardElement = getTemplate();
-  const likeButton = cardElement.querySelector(".card__like-button");
-  const deleteButton = cardElement.querySelector(".card__control-button_type_delete");
-  const cardImage = cardElement.querySelector(".card__image");
+    const cardElement = getTemplate();
+    const likeButton = cardElement.querySelector(".card__like-button");
+    const deleteButton = cardElement.querySelector(".card__control-button_type_delete");
+    const infoButton = cardElement.querySelector(".card__control-button_type_info");
+    const cardImage = cardElement.querySelector(".card__image");
+    const likeCount = cardElement.querySelector(".card__like-count");
 
-  cardImage.src = data.link;
-  cardImage.alt = data.name;
-  cardElement.querySelector(".card__title").textContent = data.name;
+    cardImage.src = data.link;
+    cardImage.alt = data.name;
+    cardElement.querySelector(".card__title").textContent = data.name;
 
-  if (onLikeIcon) {
-    likeButton.addEventListener("click", () => onLikeIcon(likeButton));
-  }
+    likeCount.textContent = data.likes.length;
 
-  if (onDeleteCard) {
-    deleteButton.addEventListener("click", () => onDeleteCard(cardElement));
-  }
+    const isLiked = data.likes.some((user) => user._id === currentUserId);
+    if (isLiked) {
+        likeButton.classList.add("card__like-button_is-active");
+    }
 
-  if (onPreviewPicture) {
-    cardImage.addEventListener("click", () => onPreviewPicture({name: data.name, link: data.link}));
-  }
+    if (data.owner._id !== currentUserId) {
+        deleteButton.remove();
+    }
 
-  return cardElement;
+    likeButton.addEventListener("click", () => {
+        const liked = likeButton.classList.contains("card__like-button_is-active");
+        onLikeCard(data._id, liked, likeButton, likeCount);
+    });
+
+    if (data.owner._id === currentUserId) {
+        deleteButton.addEventListener("click", () => {
+            onDeleteCard(data._id, cardElement);
+        });
+    }
+
+    if (infoButton) {
+        infoButton.addEventListener("click", () => {
+            onInfoCard(data);
+        });
+    }
+
+    cardImage.addEventListener("click", () => {
+        onPreviewPicture({ name: data.name, link: data.link });
+    });
+
+    return cardElement;
 };

@@ -1,12 +1,13 @@
 {
   "name": "mesto-ad",
   "version": "1.0.0",
-  "description": "Стартовый набор для выполнения проектной работы Место",
+  "description": "Учебный проект Место — сервис для публикации фотографий мест",
   "main": "index.js",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "deploy": "gh-pages -d dist"
   },
   "repository": {
     "type": "git",
@@ -15,12 +16,12 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
   "bugs": {
     "url": "https://github.com/Arsen1y-dev/mesto-ad/issues"
   },
   "homepage": "https://github.com/Arsen1y-dev/mesto-ad#readme",
   "devDependencies": {
+    "gh-pages": "^6.3.0",
     "vite": "^6.2.0"
   }
 }
