@@ -19,7 +19,7 @@
   "bugs": {
     "url": "https://github.com/Arsen1y-dev/mesto-ad/issues"
   },
-  "homepage": "https://github.com/Arsen1y-dev/mesto-ad#readme",
+  "homepage": "https://arsen1y-dev.github.io/mesto-ad/",
   "devDependencies": {
     "gh-pages": "^6.3.0",
     "vite": "^6.2.0"
