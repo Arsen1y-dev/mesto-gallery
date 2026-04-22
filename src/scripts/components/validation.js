@@ -14,10 +14,47 @@ const hideInputError = (formElement, inputElement, config) => {
     errorElement.textContent = "";
 };
 
+// Поля «имя / название»: допустимые символы по pattern + сообщение в data-error-message;
+// проверяем значение после trim(), чтобы «   » и пробелы по краям не обходили правила.
+const isTrimmedPatternTextField = (inputElement) =>
+    inputElement.tagName === "INPUT" &&
+    inputElement.type === "text" &&
+    inputElement.hasAttribute("pattern") &&
+    Boolean(inputElement.dataset.errorMessage);
+
 // Проверяет валидность поля
 const checkInputValidity = (formElement, inputElement, config) => {
-    // Если паттерн не совпадает (validity.patternMismatch), используем кастомное сообщение из data-атрибута
-    if (inputElement.validity.patternMismatch) {
+    if (isTrimmedPatternTextField(inputElement)) {
+        const trimmed = inputElement.value.trim();
+        const minLen = inputElement.minLength;
+        const maxLen = inputElement.maxLength;
+        const patternAttr = inputElement.getAttribute("pattern");
+        let patternRegex;
+
+        try {
+            patternRegex = new RegExp(patternAttr);
+        } catch {
+            patternRegex = /(?!)/;
+        }
+
+        let message = "";
+
+        if (trimmed.length === 0) {
+            if (inputElement.required) {
+                message = "Заполните это поле.";
+            }
+        } else if (minLen > 0 && trimmed.length < minLen) {
+            message = `Минимальное количество символов — ${minLen}. Сейчас — ${trimmed.length}.`;
+        } else if (maxLen > 0 && trimmed.length > maxLen) {
+            message = `Максимальное количество символов — ${maxLen}. Сейчас — ${trimmed.length}.`;
+        } else if (/ {2,}/.test(trimmed)) {
+            message = "Нельзя использовать два и более пробела подряд.";
+        } else if (!patternRegex.test(trimmed)) {
+            message = inputElement.dataset.errorMessage;
+        }
+
+        inputElement.setCustomValidity(message);
+    } else if (inputElement.validity.patternMismatch && inputElement.dataset.errorMessage) {
         inputElement.setCustomValidity(inputElement.dataset.errorMessage);
     } else {
         inputElement.setCustomValidity("");
@@ -27,7 +64,7 @@ const checkInputValidity = (formElement, inputElement, config) => {
         showInputError(
             formElement,
             inputElement,
-            inputElement.validationMessage,
+            inputElement.validationMessage || inputElement.dataset.errorMessage,
             config
         );
     } else {
@@ -99,8 +136,9 @@ export const clearValidation = (formElement, config) => {
     );
     const buttonElement = formElement.querySelector(config.submitButtonSelector);
 
-    // Сбрасываем ошибки полей
+    // Сбрасываем ошибки полей и кастомные сообщения
     inputList.forEach((inputElement) => {
+        inputElement.setCustomValidity("");
         hideInputError(formElement, inputElement, config);
     });
 

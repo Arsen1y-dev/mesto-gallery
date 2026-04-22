@@ -107,8 +107,8 @@ const handleProfileFormSubmit = (evt) => {
     renderLoading(profileFormButton, true, "Сохранить", "Сохранение...");
 
     setUserInfo({
-        name: profileTitleInput.value,
-        about: profileDescriptionInput.value,
+        name: profileTitleInput.value.trim(),
+        about: profileDescriptionInput.value.trim(),
     })
         .then((userData) => {
             profileTitle.textContent = userData.name;
@@ -124,7 +124,7 @@ const handleAvatarFormSubmit = (evt) => {
     evt.preventDefault();
     renderLoading(avatarFormButton, true, "Сохранить", "Сохранение...");
 
-    updateAvatar({ avatar: avatarInput.value })
+    updateAvatar({ avatar: avatarInput.value.trim() })
         .then((userData) => {
             profileAvatar.style.backgroundImage = `url(${userData.avatar})`;
             closeModalWindow(avatarFormModalWindow);
@@ -138,7 +138,10 @@ const handleCardFormSubmit = (evt) => {
     evt.preventDefault();
     renderLoading(cardFormButton, true, "Создать", "Создание...");
 
-    addCard({ name: cardNameInput.value, link: cardLinkInput.value })
+    addCard({
+        name: cardNameInput.value.trim(),
+        link: cardLinkInput.value.trim(),
+    })
         .then((cardData) => {
             placesWrap.prepend(
                 createCardElement(cardData, currentUserId, {
