@@ -5,6 +5,19 @@ const getTemplate = () => {
         .cloneNode(true);
 };
 
+export const updateCardLikes = (cardElement, likes, currentUserId) => {
+    const likeButton = cardElement.querySelector(".card__like-button");
+    const likeCount = cardElement.querySelector(".card__like-count");
+    const isLiked = likes.some((user) => user._id === currentUserId);
+
+    likeCount.textContent = likes.length;
+    likeButton.classList.toggle("card__like-button_is-active", isLiked);
+};
+
+export const removeCardElement = (cardElement) => {
+    cardElement.remove();
+};
+
 export const createCardElement = (
     data,
     currentUserId,
@@ -15,18 +28,11 @@ export const createCardElement = (
     const deleteButton = cardElement.querySelector(".card__control-button_type_delete");
     const infoButton = cardElement.querySelector(".card__control-button_type_info");
     const cardImage = cardElement.querySelector(".card__image");
-    const likeCount = cardElement.querySelector(".card__like-count");
 
     cardImage.src = data.link;
     cardImage.alt = data.name;
     cardElement.querySelector(".card__title").textContent = data.name;
-
-    likeCount.textContent = data.likes.length;
-
-    const isLiked = data.likes.some((user) => user._id === currentUserId);
-    if (isLiked) {
-        likeButton.classList.add("card__like-button_is-active");
-    }
+    updateCardLikes(cardElement, data.likes, currentUserId);
 
     if (data.owner._id === currentUserId) {
         deleteButton.addEventListener("click", () => {
@@ -38,7 +44,7 @@ export const createCardElement = (
 
     likeButton.addEventListener("click", () => {
         const liked = likeButton.classList.contains("card__like-button_is-active");
-        onLikeCard(data._id, liked, likeButton, likeCount);
+        onLikeCard(data._id, liked, cardElement);
     });
 
     if (infoButton) {

@@ -1,4 +1,8 @@
-import { createCardElement } from "./components/card.js";
+import {
+    createCardElement,
+    updateCardLikes,
+    removeCardElement,
+} from "./components/card.js";
 import {
     openModalWindow,
     closeModalWindow,
@@ -79,6 +83,8 @@ const validationConfig = {
 
 // Текущий пользователь
 let currentUserId = null;
+let cardToDeleteId = null;
+let cardToDeleteElement = null;
 
 // UX кнопки во время загрузки
 const renderLoading = (button, isLoading, defaultText, loadingText) => {
@@ -159,35 +165,40 @@ const handleCardFormSubmit = (evt) => {
 };
 
 // Лайк
-const handleLikeCard = (cardId, isLiked, likeButton, likeCount) => {
+const handleLikeCard = (cardId, isLiked, cardElement) => {
     changeLikeCardStatus(cardId, isLiked)
         .then((cardData) => {
-            likeButton.classList.toggle("card__like-button_is-active");
-            likeCount.textContent = cardData.likes.length;
+            updateCardLikes(cardElement, cardData.likes, currentUserId);
         })
         .catch((err) => console.error(err));
 };
 
-// Удаление через попап подтверждения
+// Открывает подтверждение удаления и сохраняет текущую карточку
 const handleDeleteCard = (cardId, cardElement) => {
+    cardToDeleteId = cardId;
+    cardToDeleteElement = cardElement;
     openModalWindow(confirmModalWindow);
+};
 
-    const handleConfirm = () => {
-        renderLoading(confirmButton, true, "Да", "Удаление...");
+// Подтверждает удаление текущей сохраненной карточки
+const handleConfirmDelete = () => {
+    if (!cardToDeleteId || !cardToDeleteElement) {
+        return;
+    }
 
-        deleteCard(cardId)
-            .then(() => {
-                cardElement.remove();
-                closeModalWindow(confirmModalWindow);
-            })
-            .catch((err) => console.error(err))
-            .finally(() => {
-                renderLoading(confirmButton, false, "Да", "Удаление...");
-                confirmButton.removeEventListener("click", handleConfirm);
-            });
-    };
+    renderLoading(confirmButton, true, "Да", "Удаление...");
 
-    confirmButton.addEventListener("click", handleConfirm);
+    deleteCard(cardToDeleteId)
+        .then(() => {
+            removeCardElement(cardToDeleteElement);
+            closeModalWindow(confirmModalWindow);
+            cardToDeleteId = null;
+            cardToDeleteElement = null;
+        })
+        .catch((err) => console.error(err))
+        .finally(() => {
+            renderLoading(confirmButton, false, "Да", "Удаление...");
+        });
 };
 
 // Вспомогательные функции для шаблонов
@@ -313,6 +324,7 @@ openCardFormButton.addEventListener("click", () => {
 
 // Логотип — статистика
 logo.addEventListener("click", handleLogoClick);
+confirmButton.addEventListener("click", handleConfirmDelete);
 
 // Обработчики закрытия попапов
 const allPopups = document.querySelectorAll(".popup");
