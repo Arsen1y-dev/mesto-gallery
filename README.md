@@ -33,6 +33,4 @@ npm run build
 npm run deploy
 ```
 
-## Ссылка на проект
-
 [Открыть проект](https://arsen1y-dev.github.io/mesto-ad-pages/)
